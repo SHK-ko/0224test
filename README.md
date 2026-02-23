@@ -1,636 +1,361 @@
-# 0224test<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 툴 가이드 — 초보자를 위한 완벽 가이드</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: #2a2a3e;
-    --accent1: #7c6ff7;
-    --accent2: #f76fa0;
-    --accent3: #6ff7d4;
-    --accent4: #f7c96f;
-    --text: #e8e8f0;
-    --muted: #8888aa;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Non-Off Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f3f4f6;
+        }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* 스크롤바 커스텀 */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+        .chat-bubble {
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-out;
+        }
 
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(124,111,247,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(247,111,160,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(111,247,212,0.04) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 24px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Hero */
-  header {
-    padding: 80px 0 60px;
-    text-align: center;
-    position: relative;
-  }
-
-  .badge {
-    display: inline-block;
-    padding: 6px 18px;
-    border: 1px solid var(--accent1);
-    border-radius: 100px;
-    font-size: 12px;
-    font-family: 'Space Mono', monospace;
-    color: var(--accent1);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-    animation: fadeDown 0.6s ease both;
-  }
-
-  h1 {
-    font-size: clamp(36px, 6vw, 72px);
-    font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -2px;
-    margin-bottom: 20px;
-    animation: fadeDown 0.7s 0.1s ease both;
-  }
-
-  h1 span.grd {
-    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .subtitle {
-    color: var(--muted);
-    font-size: 18px;
-    font-weight: 300;
-    max-width: 520px;
-    margin: 0 auto 48px;
-    line-height: 1.7;
-    animation: fadeDown 0.7s 0.2s ease both;
-  }
-
-  /* Section layout */
-  section {
-    margin-bottom: 64px;
-    animation: fadeUp 0.7s ease both;
-  }
-
-  .section-label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .section-label .icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-
-  .section-label h2 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-  }
-
-  .section-label .line {
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Cards grid */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
-
-  .card:hover::before { opacity: 1; }
-
-  .card.purple::before { background: linear-gradient(90deg, var(--accent1), var(--accent2)); }
-  .card.pink::before   { background: linear-gradient(90deg, var(--accent2), var(--accent4)); }
-  .card.teal::before   { background: linear-gradient(90deg, var(--accent3), var(--accent1)); }
-  .card.yellow::before { background: linear-gradient(90deg, var(--accent4), var(--accent2)); }
-
-  .card:hover.purple { border-color: rgba(124,111,247,0.4); }
-  .card:hover.pink   { border-color: rgba(247,111,160,0.4); }
-  .card:hover.teal   { border-color: rgba(111,247,212,0.4); }
-  .card:hover.yellow { border-color: rgba(247,201,111,0.4); }
-
-  .card-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .dot.purple { background: var(--accent1); }
-  .dot.pink   { background: var(--accent2); }
-  .dot.teal   { background: var(--accent3); }
-  .dot.yellow { background: var(--accent4); }
-
-  .tool-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .tool-list li {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--muted);
-    padding-left: 12px;
-    position: relative;
-  }
-
-  .tool-list li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    font-size: 11px;
-    opacity: 0.5;
-  }
-
-  .tool-list li strong {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  /* Tags */
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-  }
-
-  .tag {
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-family: 'Space Mono', monospace;
-    font-weight: 400;
-    border: 1px solid;
-  }
-
-  .tag.purple { color: var(--accent1); border-color: rgba(124,111,247,0.3); background: rgba(124,111,247,0.08); }
-  .tag.pink   { color: var(--accent2); border-color: rgba(247,111,160,0.3); background: rgba(247,111,160,0.08); }
-  .tag.teal   { color: var(--accent3); border-color: rgba(111,247,212,0.3); background: rgba(111,247,212,0.08); }
-  .tag.yellow { color: var(--accent4); border-color: rgba(247,201,111,0.3); background: rgba(247,201,111,0.08); }
-
-  /* Big featured card */
-  .featured-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  @media (max-width: 640px) {
-    .featured-grid { grid-template-columns: 1fr; }
-    .cards { grid-template-columns: 1fr; }
-  }
-
-  .big-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    grid-column: span 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 24px;
-    align-items: start;
-  }
-
-  @media (max-width: 640px) {
-    .big-card { grid-column: span 1; grid-template-columns: 1fr; }
-  }
-
-  .big-card-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: var(--accent1);
-    grid-column: 1 / -1;
-  }
-
-  .mini-section h3 {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  /* Flow chart style for automation */
-  .flow {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .flow-item {
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-  }
-
-  .flow-arrow {
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 48px 0;
-    color: var(--muted);
-    font-size: 13px;
-    border-top: 1px solid var(--border);
-    margin-top: 32px;
-  }
-
-  footer a {
-    color: var(--accent1);
-    text-decoration: none;
-  }
-
-  /* Animations */
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  section:nth-child(1) { animation-delay: 0.3s; }
-  section:nth-child(2) { animation-delay: 0.4s; }
-  section:nth-child(3) { animation-delay: 0.5s; }
-  section:nth-child(4) { animation-delay: 0.6s; }
-  section:nth-child(5) { animation-delay: 0.7s; }
-  section:nth-child(6) { animation-delay: 0.8s; }
-
-  /* Glow effects */
-  .glow-purple { box-shadow: 0 0 40px rgba(124,111,247,0.1); }
-  .glow-teal   { box-shadow: 0 0 40px rgba(111,247,212,0.1); }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* Notice box */
-  .notice {
-    background: rgba(124,111,247,0.08);
-    border: 1px solid rgba(124,111,247,0.25);
-    border-radius: 12px;
-    padding: 20px 24px;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    margin-bottom: 32px;
-  }
-
-  .notice .icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
-  .notice p { font-size: 14px; line-height: 1.7; color: var(--muted); }
-  .notice p strong { color: var(--text); }
-</style>
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4">
 
-<div class="container">
+    <!-- 메인 컨테이너 (모바일 앱 스타일) -->
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[800px] max-h-[90vh] border border-gray-200">
+        
+        <!-- 헤더 -->
+        <header class="bg-slate-900 text-white p-4 flex items-center justify-between shadow-md z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-slate-900 font-bold text-lg">
+                    N
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg">Cafe Non-Off</h1>
+                    <div class="flex items-center text-xs text-green-400">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span>
+                        영업중 (24시간)
+                    </div>
+                </div>
+            </div>
+            <button onclick="resetChat()" class="text-gray-300 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 13.19-13.19M4.422 4.422l.008.008M4.422 4.422h.002" />
+                </svg>
+            </button>
+        </header>
 
-  <header>
-    <div class="badge">✦ Beginner's Guide · 2025</div>
-    <h1>초보자를 위한<br><span class="grd">AI 툴 가이드</span></h1>
-    <p class="subtitle">지금 가장 쓸만한 AI 툴들을 카테고리별로 정리했습니다. 처음 시작하는 분도 쉽게 따라할 수 있어요.</p>
-  </header>
+        <!-- 채팅 영역 -->
+        <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 scrollbar-hide">
+            <!-- 봇 초기 메시지 -->
+            <div class="flex justify-start chat-bubble">
+                <div class="bg-white border border-gray-200 text-gray-800 p-4 rounded-2xl rounded-tl-none shadow-sm">
+                    <p class="mb-2">안녕하세요! 목동 24시간 브런치 카페 <b>논오프(Non-Off)</b>입니다. ☕️</p>
+                    <p>무엇을 도와드릴까요?</p>
+                </div>
+            </div>
+            
+            <!-- 퀵 메뉴 버튼 -->
+            <div class="grid grid-cols-2 gap-2 text-sm">
+                <button onclick="handleKeyword('메뉴')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">☕️ 메뉴/가격</button>
+                <button onclick="handleKeyword('위치')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">📍 위치/주차</button>
+                <button onclick="handleKeyword('영업시간')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">⏰ 영업시간</button>
+                <button onclick="handleKeyword('추천')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">👍 추천 메뉴</button>
+                <button onclick="handleKeyword('반려동물')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">🐶 반려동물</button>
+                <button onclick="handleKeyword('와이파이')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">📡 와이파이</button>
+            </div>
+        </main>
 
-  <div class="notice">
-    <div class="icon">💡</div>
-    <p><strong>사용 팁:</strong> 카테고리별로 분류된 툴들을 확인하세요. 무료 툴부터 시작해서 필요에 따라 유료 툴로 확장하는 것을 추천합니다.</p>
-  </div>
+        <!-- 입력 영역 -->
+        <footer class="p-3 bg-white border-t border-gray-100">
+            <form id="chat-form" class="flex gap-2" onsubmit="handleSubmit(event)">
+                <input 
+                    type="text" 
+                    id="user-input" 
+                    class="flex-1 bg-gray-100 text-gray-800 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-300 transition" 
+                    placeholder="궁금한 내용을 입력하세요..."
+                    autocomplete="off"
+                >
+                <button 
+                    type="submit" 
+                    class="bg-slate-900 text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-slate-700 transition shadow-lg"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                    </svg>
+                </button>
+            </form>
+        </footer>
 
-  <!-- LLM 섹션 -->
-  <section>
-    <div class="section-label">
-      <div class="icon" style="background: rgba(124,111,247,0.15);">🧠</div>
-      <h2>LLM (대화형 AI)</h2>
-      <div class="line"></div>
     </div>
-    <div class="cards">
-      <div class="card purple glow-purple">
-        <div class="card-title"><span class="dot purple"></span>ChatGPT</div>
-        <ul class="tool-list">
-          <li><strong>강점:</strong> 추론 능력 탁월</li>
-          <li>복잡한 문제 해결, 단계별 분석</li>
-          <li>무료 버전 이용 가능</li>
-        </ul>
-        <div class="tags">
-          <span class="tag purple">추론</span>
-          <span class="tag purple">범용</span>
-        </div>
-      </div>
 
-      <div class="card pink">
-        <div class="card-title"><span class="dot pink"></span>Gemini</div>
-        <ul class="tool-list">
-          <li><strong>강점:</strong> 최근 업데이트로 대부분 영역 높은 성능</li>
-          <li>나노바나나, VEO3 등 이미지·영상 뛰어남</li>
-          <li>Google 서비스 연동</li>
-        </ul>
-        <div class="tags">
-          <span class="tag pink">이미지</span>
-          <span class="tag pink">영상</span>
-          <span class="tag pink">멀티모달</span>
-        </div>
-      </div>
+    <script>
+        // 카페 데이터베이스 (검색된 정보 기반)
+        const cafeData = {
+            info: {
+                name: "논오프 (Non-Off)",
+                address: "서울 양천구 국회대로 279 1층 (목동역 3번 출구 인근)",
+                hours: "매일 00:00 - 24:00 (연중무휴)",
+                phone: "0507-1344-7009",
+                parking: "매장 앞 주차 가능합니다. (공간 여유로운 편)",
+                wifi: "ID: Nonoff_5G / PW: nonoffcoffee1!", // 가상의 예시
+                pet: "반려동물 동반 가능합니다! 🐶 (테라스 및 실내 일부)",
+                toilet: "매장 내 남녀 구분 화장실이 있습니다."
+            },
+            menu: {
+                signature: [
+                    { name: "에그 인 헬", price: "8,900원", desc: "매콤한 토마토 소스 브런치" },
+                    { name: "프렌치 토스트", price: "7,800원", desc: "촉촉하고 달콤한 인생 토스트" },
+                    { name: "가츠산도", price: "8,500원", desc: "두툼한 돈까스 샌드위치" },
+                    { name: "소금빵", price: "2,800원~", desc: "기본, 치즈, 대파크림치즈 등 다양" }
+                ],
+                coffee: [
+                    { name: "아메리카노", price: "4,500원" },
+                    { name: "카페라떼", price: "5,000원" },
+                    { name: "바닐라라떼", price: "5,500원" },
+                    { name: "아인슈페너", price: "6,000원" }
+                ],
+                dessert: [
+                    { name: "크로플", price: "변동" },
+                    { name: "케이크", price: "변동" }
+                ]
+            }
+        };
 
-      <div class="card teal">
-        <div class="card-title"><span class="dot teal"></span>Claude</div>
-        <ul class="tool-list">
-          <li><strong>강점:</strong> 글쓰기, 수학, 코딩, 시각화</li>
-          <li>긴 문서 분석 및 요약</li>
-          <li>섬세하고 자연스러운 글쓰기</li>
-        </ul>
-        <div class="tags">
-          <span class="tag teal">글쓰기</span>
-          <span class="tag teal">코딩</span>
-          <span class="tag teal">시각화</span>
-        </div>
-      </div>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
 
-      <div class="card yellow">
-        <div class="card-title"><span class="dot yellow"></span>Perplexity</div>
-        <ul class="tool-list">
-          <li><strong>강점:</strong> 정확한 정보 검색의 시작</li>
-          <li>실시간 웹 검색 + AI 답변</li>
-          <li>출처 명시로 신뢰도 높음</li>
-        </ul>
-        <div class="tags">
-          <span class="tag yellow">검색</span>
-          <span class="tag yellow">정보수집</span>
-        </div>
-      </div>
-    </div>
-  </section>
+        // 메시지 추가 함수
+        function addMessage(text, sender, isHtml = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} chat-bubble w-full`;
+            
+            const bubble = document.createElement('div');
+            const baseClasses = "p-4 rounded-2xl shadow-sm max-w-[85%] text-sm leading-relaxed";
+            
+            if (sender === 'user') {
+                bubble.className = `${baseClasses} bg-orange-500 text-white rounded-tr-none`;
+                bubble.textContent = text;
+            } else {
+                bubble.className = `${baseClasses} bg-white border border-gray-200 text-gray-800 rounded-tl-none`;
+                if (isHtml) {
+                    bubble.innerHTML = text;
+                } else {
+                    bubble.textContent = text;
+                }
+            }
 
-  <!-- 이미지 생성 -->
-  <section>
-    <div class="section-label">
-      <div class="icon" style="background: rgba(247,111,160,0.15);">🎨</div>
-      <h2>이미지 생성</h2>
-      <div class="line"></div>
-    </div>
-    <div class="cards">
-      <div class="card teal">
-        <div class="card-title"><span class="dot teal"></span>무료 툴</div>
-        <ul class="tool-list">
-          <li><strong>Nanobanana</strong> — 빠르고 쉬운 이미지 생성</li>
-          <li><strong>ImageFX</strong> — Google의 AI 이미지 툴</li>
-          <li><strong>Whisk</strong> — 이미지 리믹싱</li>
-          <li><strong>Maxboard</strong> — 다용도 생성 툴</li>
-          <li><strong>Stitch</strong> — 간편한 이미지 편집</li>
-        </ul>
-        <div class="tags">
-          <span class="tag teal">무료</span>
-          <span class="tag teal">초보자 추천</span>
-        </div>
-      </div>
+            wrapper.appendChild(bubble);
+            chatContainer.appendChild(wrapper);
+            
+            // 퀵 메뉴 버튼 뒤로 스크롤
+            scrollToBottom();
+        }
 
-      <div class="card pink">
-        <div class="card-title"><span class="dot pink"></span>예술적 스타일</div>
-        <ul class="tool-list">
-          <li><strong>Midjourney</strong> — 예술적·다양한 스타일, 최고의 품질</li>
-          <li><strong>ChatGPT</strong> — DALL-E 통합, 무료 가능</li>
-          <li><strong>Genspark</strong> — 다양한 모델 체험 가능 (크레딧 필요)</li>
-        </ul>
-        <div class="tags">
-          <span class="tag pink">고품질</span>
-          <span class="tag pink">예술</span>
-        </div>
-      </div>
-    </div>
-  </section>
+        // 로딩 표시 함수
+        function showLoading() {
+            const wrapper = document.createElement('div');
+            wrapper.id = 'loading-bubble';
+            wrapper.className = 'flex justify-start chat-bubble w-full';
+            wrapper.innerHTML = `
+                <div class="bg-white border border-gray-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex gap-1">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                </div>
+            `;
+            chatContainer.appendChild(wrapper);
+            scrollToBottom();
+        }
 
-  <!-- 영상 생성 -->
-  <section>
-    <div class="section-label">
-      <div class="icon" style="background: rgba(111,247,212,0.15);">🎬</div>
-      <h2>영상 생성</h2>
-      <div class="line"></div>
-    </div>
-    <div class="cards">
-      <div class="card teal glow-teal">
-        <div class="card-title"><span class="dot teal"></span>무료 — SNS·UGC용</div>
-        <ul class="tool-list">
-          <li><strong>Flow</strong> — 빠른 영상 생성</li>
-          <li><strong>Whisk</strong> — 이미지→영상</li>
-          <li><strong>Grok</strong> — X(트위터) AI 영상</li>
-          <li><strong>Notebook LM</strong> — 학습용 동영상 제작</li>
-        </ul>
-        <div class="tags">
-          <span class="tag teal">무료</span>
-          <span class="tag teal">SNS</span>
-        </div>
-      </div>
+        // 로딩 제거 함수
+        function removeLoading() {
+            const loading = document.getElementById('loading-bubble');
+            if (loading) loading.remove();
+        }
 
-      <div class="card purple">
-        <div class="card-title"><span class="dot purple"></span>단일 모델 (전문용)</div>
-        <ul class="tool-list">
-          <li><strong>Runway</strong> — 영상 업계 표준</li>
-          <li><strong>Kling</strong> — 고품질 중국 AI</li>
-          <li><strong>Hailuo</strong> — 빠른 생성 속도</li>
-          <li><strong>Seedance 2.0</strong> — 최신 모델</li>
-          <li><strong>Dreamina</strong> — 다기능 영상툴</li>
-        </ul>
-        <div class="tags">
-          <span class="tag purple">전문</span>
-          <span class="tag purple">고품질</span>
-        </div>
-      </div>
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-      <div class="card yellow">
-        <div class="card-title"><span class="dot yellow"></span>멀티 모델 플랫폼</div>
-        <ul class="tool-list">
-          <li><strong>Higgsfield</strong> — 여러 모델 한 곳에</li>
-          <li><strong>Freepik</strong> — 스톡+AI 생성 통합</li>
-          <li><strong>Genspark</strong> — AI 에이전트 기반</li>
-        </ul>
-        <div class="tags">
-          <span class="tag yellow">멀티모델</span>
-          <span class="tag yellow">편의성</span>
-        </div>
-      </div>
-    </div>
-  </section>
+        // 봇 응답 생성 로직
+        function getBotResponse(input) {
+            const text = input.toLowerCase().replace(/\s/g, ''); // 공백 제거 및 소문자
 
-  <!-- PPT & 웹 프로토타입 -->
-  <section>
-    <div class="section-label">
-      <div class="icon" style="background: rgba(247,201,111,0.15);">📊</div>
-      <h2>PPT & 웹 프로토타입</h2>
-      <div class="line"></div>
-    </div>
-    <div class="featured-grid">
-      <div class="card yellow">
-        <div class="card-title"><span class="dot yellow"></span>PPT 제작</div>
-        <ul class="tool-list">
-          <li>AI 기반 슬라이드 자동 생성</li>
-          <li>프롬프트 입력 → 완성된 프레젠테이션</li>
-          <li>다양한 템플릿 및 디자인</li>
-        </ul>
-        <div class="tags">
-          <span class="tag yellow">발표자료</span>
-          <span class="tag yellow">자동화</span>
-        </div>
-      </div>
+            // 1. 메뉴/가격/추천
+            if (text.includes('메뉴') || text.includes('가격') || text.includes('얼마') || text.includes('커피') || text.includes('디저트')) {
+                let menuHtml = `<p class="font-bold text-lg mb-2">☕️ NON-OFF MENU</p>`;
+                
+                menuHtml += `<p class="font-bold text-orange-600 mt-2">🌟 시그니처 & 브런치</p><ul class="list-disc pl-4 space-y-1">`;
+                cafeData.menu.signature.forEach(m => {
+                    menuHtml += `<li><b>${m.name}</b>: ${m.price}</li>`;
+                });
+                menuHtml += `</ul>`;
 
-      <div class="card purple">
-        <div class="card-title"><span class="dot purple"></span>웹 프로토타입 / 목업</div>
-        <ul class="tool-list">
-          <li><strong>Gemini Canvas</strong> — Google의 실시간 편집</li>
-          <li><strong>Claude Artifact</strong> — 코드+미리보기 동시</li>
-          <li><strong>Genspark</strong> — 에이전트 기반 제작</li>
-        </ul>
-        <div class="tags">
-          <span class="tag purple">목업</span>
-          <span class="tag purple">프로토타입</span>
-        </div>
-      </div>
-    </div>
-  </section>
+                menuHtml += `<p class="font-bold text-orange-600 mt-3">☕️ 커피 & 음료</p><ul class="list-disc pl-4 space-y-1">`;
+                cafeData.menu.coffee.slice(0,3).forEach(m => {
+                    menuHtml += `<li>${m.name}: ${m.price}</li>`;
+                });
+                menuHtml += `</ul><p class="text-xs text-gray-400 mt-2">* 더 많은 메뉴는 매장에서 확인해주세요!</p>`;
+                
+                return menuHtml;
+            }
 
-  <!-- 자동화 & 바이브코딩 -->
-  <section>
-    <div class="section-label">
-      <div class="icon" style="background: rgba(111,247,212,0.15);">⚡</div>
-      <h2>자동화 & 바이브코딩</h2>
-      <div class="line"></div>
-    </div>
-    <div class="cards">
-      <div class="card teal glow-teal">
-        <div class="card-title"><span class="dot teal"></span>자동화 툴</div>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.6;">코딩 없이 워크플로우를 자동화하세요</p>
-        <div class="flow">
-          <span class="flow-item">Google Opal</span>
-          <span class="flow-arrow">·</span>
-          <span class="flow-item">Make</span>
-          <span class="flow-arrow">·</span>
-          <span class="flow-item">Zapier</span>
-          <span class="flow-arrow">·</span>
-          <span class="flow-item">n8n</span>
-        </div>
-        <div class="tags" style="margin-top: 16px;">
-          <span class="tag teal">노코드</span>
-          <span class="tag teal">워크플로우</span>
-        </div>
-      </div>
+            // 2. 추천
+            if (text.includes('추천') || text.includes('인기') || text.includes('맛있는')) {
+                return `
+                    <p class="font-bold mb-2">👍 논오프 사장님 추천!</p>
+                    <p class="mb-2">출출하실 땐 <b class="text-orange-600">에그 인 헬</b>과 <b class="text-orange-600">가츠산도</b>가 인기가 많아요. 🥘</p>
+                    <p>달달한게 땡기시면 <b class="text-orange-600">프렌치 토스트</b>나 <b class="text-orange-600">소금빵</b>에 라떼 한 잔 추천드립니다! 🥐</p>
+                `;
+            }
 
-      <div class="card pink">
-        <div class="card-title"><span class="dot pink"></span>바이브코딩</div>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.6;">자연어로 코드를 작성하는 새로운 방식</p>
-        <ul class="tool-list">
-          <li><strong>Google AI Studio</strong> — 강력한 무료 환경</li>
-          <li><strong>Cursor / Windsurf</strong> — AI 코드 에디터</li>
-          <li><strong>V0 / Lovable</strong> — UI 컴포넌트 생성</li>
-          <li><strong>Base44</strong> — 앱 빌더</li>
-          <li><strong>Antigravity</strong> — 자연어 코딩</li>
-          <li><strong>VS Code</strong> — Copilot 통합</li>
-        </ul>
-        <div class="tags">
-          <span class="tag pink">코딩</span>
-          <span class="tag pink">AI 개발</span>
-        </div>
-      </div>
-    </div>
-  </section>
+            // 3. 영업시간
+            if (text.includes('시간') || text.includes('영업') || text.includes('언제') || text.includes('닫') || text.includes('휴무')) {
+                return `
+                    <p class="font-bold text-lg mb-1">⏰ 영업시간 안내</p>
+                    <p class="text-xl font-bold text-blue-600">${cafeData.info.hours}</p>
+                    <p class="mt-2 text-sm text-gray-600">저희는 24시간 언제나 열려있습니다. 늦은 밤에도 편하게 방문해주세요! 🌙</p>
+                `;
+            }
 
-  <footer>
-    <p style="margin-bottom: 8px;">AI 툴 가이드 · 초보자를 위한 완벽 정리</p>
-    <p>© 2025 Martin Edu Co., Ltd. · AI Education & Consulting</p>
-  </footer>
+            // 4. 위치/주차/가는길
+            if (text.includes('위치') || text.includes('주소') || text.includes('어디') || text.includes('주차') || text.includes('차') || text.includes('맵')) {
+                return `
+                    <p class="font-bold mb-2">📍 위치 & 주차 정보</p>
+                    <p class="mb-1"><b>주소:</b> ${cafeData.info.address}</p>
+                    <p class="mb-3 text-sm text-gray-500">(목동역 3번 출구에서 가깝습니다)</p>
+                    <hr class="my-2 border-gray-200">
+                    <p class="font-bold mb-1">🚗 주차</p>
+                    <p>${cafeData.info.parking}</p>
+                `;
+            }
 
-</div>
+            // 5. 편의시설 (와이파이, 화장실, 콘센트, 노트북)
+            if (text.includes('와이파이') || text.includes('비번') || text.includes('wifi')) {
+                return `📡 와이파이 정보입니다.<br><b>${cafeData.info.wifi}</b>`;
+            }
+            
+            if (text.includes('화장실')) {
+                return `🚻 ${cafeData.info.toilet}`;
+            }
 
+            if (text.includes('콘센트') || text.includes('노트북') || text.includes('공부') || text.includes('스터디')) {
+                return `💻 네! 노트북하기 좋은 넓은 테이블과 콘센트가 넉넉히 준비되어 있습니다. 카공(카페 공부) 환영해요!`;
+            }
+
+            // 6. 반려동물
+            if (text.includes('개') || text.includes('강아지') || text.includes('고양이') || text.includes('애견') || text.includes('반려') || text.includes('펫')) {
+                return `🐶 <b>${cafeData.info.pet}</b><br>사랑하는 댕댕이와 함께 오셔서 테라스의 낭만을 즐겨보세요!`;
+            }
+
+            // 7. 전화
+            if (text.includes('전화') || text.includes('번호') || text.includes('연락')) {
+                return `📞 매장 전화번호는 <b>${cafeData.info.phone}</b> 입니다.`;
+            }
+
+            // 8. 인사
+            if (text.includes('안녕') || text.includes('반가')) {
+                return `안녕하세요! 오늘도 논오프를 찾아주셔서 감사합니다. 😊 커피 한 잔 어떠세요?`;
+            }
+
+             // 9. 감사
+             if (text.includes('고마') || text.includes('감사') || text.includes('땡큐')) {
+                return `도움이 되어서 기쁘네요! 매장에서 뵙겠습니다. 🥰`;
+            }
+
+            // 기본 응답
+            return `
+                죄송해요, 제가 잘 모르는 내용이에요. 😅<br>
+                <br>
+                - <b>메뉴, 영업시간, 위치, 주차</b> 등에 대해 물어봐 주세요.<br>
+                - 기타 문의는 매장으로 전화 주시면 친절히 안내해 드릴게요!<br>
+                📞 <a href="tel:${cafeData.info.phone}" class="text-blue-500 underline">${cafeData.info.phone}</a>
+            `;
+        }
+
+        // 키워드 핸들러 (버튼 클릭용)
+        function handleKeyword(keyword) {
+            handleSubmit(null, keyword);
+        }
+
+        // 전송 핸들러
+        async function handleSubmit(event, keyword = null) {
+            if (event) event.preventDefault();
+            
+            const text = keyword || userInput.value.trim();
+            if (!text) return;
+
+            // 사용자 메시지 표시
+            addMessage(text, 'user');
+            userInput.value = '';
+
+            // 로딩 표시
+            showLoading();
+
+            // 봇 응답 지연 시뮬레이션 (자연스러움)
+            setTimeout(() => {
+                removeLoading();
+                const response = getBotResponse(text);
+                addMessage(response, 'bot', true);
+            }, 600 + Math.random() * 500);
+        }
+
+        function resetChat() {
+            const bubbles = document.querySelectorAll('.chat-bubble');
+            // 첫 번째(인사말)과 퀵 버튼을 제외하고 삭제하려면 인덱스 조정 필요하지만,
+            // 간단하게 리로드하거나 내용을 비우고 초기 메시지만 다시 넣습니다.
+            chatContainer.innerHTML = '';
+            
+            // 초기 메시지 복구
+            const initialMsg = document.createElement('div');
+            initialMsg.className = "flex justify-start chat-bubble";
+            initialMsg.innerHTML = `
+                <div class="bg-white border border-gray-200 text-gray-800 p-4 rounded-2xl rounded-tl-none shadow-sm">
+                    <p class="mb-2">안녕하세요! 목동 24시간 브런치 카페 <b>논오프(Non-Off)</b>입니다. ☕️</p>
+                    <p>초기화 되었습니다. 무엇을 도와드릴까요?</p>
+                </div>
+            `;
+            chatContainer.appendChild(initialMsg);
+            
+            // 퀵메뉴 버튼 복구 (HTML 문자열로 다시 삽입)
+            const quickMenu = document.createElement('div');
+            quickMenu.className = "grid grid-cols-2 gap-2 text-sm";
+            quickMenu.innerHTML = `
+                <button onclick="handleKeyword('메뉴')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">☕️ 메뉴/가격</button>
+                <button onclick="handleKeyword('위치')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">📍 위치/주차</button>
+                <button onclick="handleKeyword('영업시간')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">⏰ 영업시간</button>
+                <button onclick="handleKeyword('추천')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">👍 추천 메뉴</button>
+                <button onclick="handleKeyword('반려동물')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">🐶 반려동물</button>
+                <button onclick="handleKeyword('와이파이')" class="bg-white border border-orange-200 text-orange-600 p-2 rounded-xl hover:bg-orange-50 transition shadow-sm text-left px-3">📡 와이파이</button>
+            `;
+            chatContainer.appendChild(quickMenu);
+        }
+    </script>
 </body>
 </html>
